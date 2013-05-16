@@ -1,4 +1,4 @@
-package com.thoughtworks.jwindowsautomation;
+package com.thoughtworks.automation.windows;
 
 import java.io.BufferedReader;
 import java.io.IOException;

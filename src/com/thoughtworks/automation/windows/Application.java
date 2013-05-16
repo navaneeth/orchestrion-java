@@ -1,4 +1,4 @@
-package com.thoughtworks.jwindowsautomation;
+package com.thoughtworks.automation.windows;
 
 public class Application {
 
