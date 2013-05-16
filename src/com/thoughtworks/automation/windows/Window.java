@@ -15,12 +15,12 @@ public class Window {
 	}
 	
 	public MenuBar getMenuBar() throws Exception {
-		int id = server.executeAndGetId("getmenubar", refId, null);
+		int id = server.executeAndGetId("getmenubar", refId);
 		return new MenuBar(id, refId);
 	}	
 		
 	public void close() throws Exception {
-		server.execute("close", refId, null);
+		server.execute("close", refId);
 	}
 	
 	public Button getButton(By by) throws Exception {

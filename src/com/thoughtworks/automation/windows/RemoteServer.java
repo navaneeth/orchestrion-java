@@ -22,6 +22,10 @@ public class RemoteServer {
 		this(8082);
 	}
 	
+	public int executeAndGetId(String command, int refId) throws Exception {
+		return executeAndGetId(command, refId, null, (String[]) null);
+	}
+	
 	public int executeAndGetId(String command, int refId, String... parameters) throws Exception {
 		return executeAndGetId(command, refId, null, parameters);
 	}
@@ -36,6 +40,10 @@ public class RemoteServer {
 		catch(NumberFormatException ex) {
 			throw new RuntimeException("Failed to get an id from remote the server");
 		}
+	}
+	
+	public String execute(String command, int refId) throws Exception {
+		return execute(command, refId, null, (String[]) null);
 	}
 	
 	public String execute(String command, int refId, String... parameters) throws Exception {
