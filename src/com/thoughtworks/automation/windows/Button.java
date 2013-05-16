@@ -13,7 +13,7 @@ public class Button {
 	}
 	
 	public void click() throws Exception {
-		server.execute("click", refId, (String[]) null);
+		server.execute("click", refId);
 	}
 
 }

@@ -22,7 +22,7 @@ public class Application {
 	}
 	
 	public void close() throws Exception {
-		server.execute("close", refId, null);
+		server.execute("close", refId);
 	}
 
 }
