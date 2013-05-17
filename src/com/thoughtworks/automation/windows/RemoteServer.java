@@ -10,18 +10,29 @@ import java.net.URL;
 import java.net.URLEncoder;
 
 public class RemoteServer {
-
-	private final int port;
-	private String serverURL = "http://localhost";
-
-	public RemoteServer(int port) {
-		this.port = port;
-	}
-
-	public RemoteServer() {
-		this(8082);
+	
+	private static RemoteServer _instance = null; 
+	public static void initialize(int port, int connectTimeout) {
+		_instance = new RemoteServer(port, connectTimeout);		
 	}
 	
+	public static RemoteServer instance() {
+		if (_instance == null) {
+			initialize(8082, 10000);
+		}
+		
+		return _instance;
+	}
+	
+	private final int port;
+	private String serverURL = "http://localhost";
+	private final int connectTimeout;
+
+	public RemoteServer(int port, int connectTimeout) {
+		this.port = port;
+		this.connectTimeout = connectTimeout;
+	}
+
 	public int executeAndGetId(String command, int refId) throws Exception {
 		return executeAndGetId(command, refId, null, (String[]) null);
 	}
@@ -83,7 +94,7 @@ public class RemoteServer {
 			connection = (HttpURLConnection) url.openConnection();
 			connection.setRequestMethod("GET");
 			connection.setDoInput(true);
-			connection.setConnectTimeout(100000);
+			connection.setConnectTimeout(connectTimeout);
 
 			if (connection.getResponseCode() != HttpURLConnection.HTTP_OK) {
 				InputStream errorStream = connection.getErrorStream();

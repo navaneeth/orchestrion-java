@@ -1,14 +1,12 @@
-package com.thoughtworks.automation.windows;
+package com.thoughtworks.automation.windows.controls;
+
+import com.thoughtworks.automation.windows.RemoteServer;
 
 /**
  * Represents a combobox.
  *
  */
-public class Combobox {
-
-	private final int refId;
-	private final int windowId;
-	private RemoteServer server;
+public class Combobox extends Control {
 
 	/**
 	 * Creates a new combobox instance
@@ -17,9 +15,7 @@ public class Combobox {
 	 * @param windowId	Ref id of the window where this control belongs to
 	 */
 	public Combobox(int refId, int windowId) {
-		this.refId = refId;
-		this.windowId = windowId;
-		this.server = new RemoteServer();
+		super(refId, windowId);
 	}
 	
 	/**
@@ -33,7 +29,7 @@ public class Combobox {
 			throw new IllegalArgumentException(textToSelect);
 		}
 		
-		server.execute("selecttext", refId, textToSelect);
+		RemoteServer.instance().execute("selecttext", getRefId(), textToSelect);
 	}
 	
 	/**
@@ -43,7 +39,7 @@ public class Combobox {
 	 * @throws Exception
 	 */
 	public boolean isEditable() throws Exception {
-		String result = server.execute("iseditable", refId);
+		String result = RemoteServer.instance().execute("iseditable", getRefId());
 		return Boolean.parseBoolean(result);
 	}
 	
