@@ -12,8 +12,20 @@ public abstract class UIItem implements IUIItem {
 		return refId;
 	}
 	
+	public boolean isEnabled() throws Exception {
+		return Boolean.parseBoolean(RemoteServer.instance().execute("isenabled", getRefId()));
+	}
+	
+	public boolean isOffScreen() throws Exception {
+		return Boolean.parseBoolean(RemoteServer.instance().execute("isoffscreen", getRefId()));
+	}
+	
 	public void click() throws Exception {
 		RemoteServer.instance().execute("click", getRefId());
+	}
+	
+	public void doubleClick() throws Exception {
+		RemoteServer.instance().execute("doubleclick", getRefId());
 	}
 
 }

@@ -6,8 +6,13 @@ public class Application {
 
 	private final int refId;
 
-	public static Application Launch(String applicationPath) throws Exception {		
+	public static Application launch(String applicationPath) throws Exception {		
 		int refId = RemoteServer.instance().executeAndGetId("launch", 0, applicationPath);
+		return new Application(refId);
+	}
+	
+	public static Application attach(int processId) throws Exception {
+		int refId = RemoteServer.instance().executeAndGetId("attach", 0, String.format("%d", processId));
 		return new Application(refId);
 	}
 	

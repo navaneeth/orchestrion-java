@@ -17,7 +17,11 @@ public class Window extends UIItem {
 	public MenuBar getMenuBar() throws Exception {
 		int id = RemoteServer.instance().executeAndGetId("getmenubar", getRefId());
 		return new MenuBar(id, getRefId());
-	}	
+	}
+	
+	public String getTitle() throws Exception {
+		return RemoteServer.instance().execute("gettitle", getRefId());
+	}
 		
 	public void close() throws Exception {
 		RemoteServer.instance().execute("close", getRefId());
