@@ -20,6 +20,14 @@ public abstract class UIItem implements IUIItem {
 		return Boolean.parseBoolean(RemoteServer.instance().execute("isoffscreen", getRefId()));
 	}
 	
+	public boolean isFocused() throws Exception {
+		return Boolean.parseBoolean(RemoteServer.instance().execute("isfocused", getRefId()));
+	}
+	
+	public void setFocus() throws Exception {
+		RemoteServer.instance().execute("setfocus", getRefId());
+	}
+	
 	public void click() throws Exception {
 		RemoteServer.instance().execute("click", getRefId());
 	}
