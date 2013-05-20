@@ -1,8 +1,5 @@
-package com.thoughtworks.automation.windows.controls;
+package com.thoughtworks.automation.orchestrion;
 
-import com.thoughtworks.automation.windows.By;
-import com.thoughtworks.automation.windows.RemoteServer;
-import com.thoughtworks.automation.windows.UIItem;
 
 public class Window extends UIItem {
 
@@ -43,6 +40,15 @@ public class Window extends UIItem {
 		
 		int id = RemoteServer.instance().executeAndGetId("getcombobox", getRefId(), by, by.getValue());
 		return new Combobox(id, getRefId());
+	}
+	
+	public ListBox getListBox(By by) throws Exception {
+		if (by == null) {
+			throw new IllegalArgumentException("by");
+		}
+		
+		int id = RemoteServer.instance().executeAndGetId("getlistbox", getRefId(), by, by.getValue());
+		return new ListBox(id, getRefId());
 	}
 
 }

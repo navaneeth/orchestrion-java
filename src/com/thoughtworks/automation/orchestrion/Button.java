@@ -1,4 +1,4 @@
-package com.thoughtworks.automation.windows.controls;
+package com.thoughtworks.automation.orchestrion;
 
 public class Button extends Control {
 	

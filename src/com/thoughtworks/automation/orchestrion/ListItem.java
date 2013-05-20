@@ -1,7 +1,5 @@
-package com.thoughtworks.automation.windows.controls;
+package com.thoughtworks.automation.orchestrion;
 
-import com.thoughtworks.automation.windows.RemoteServer;
-import com.thoughtworks.automation.windows.UIItem;
 
 public class ListItem extends UIItem {
 
@@ -27,6 +25,10 @@ public class ListItem extends UIItem {
 	
 	public boolean isSelected() throws Exception {
 		return Boolean.parseBoolean(RemoteServer.instance().execute("isselected", getRefId()));
+	}
+	
+	public String getText() throws Exception {
+		return RemoteServer.instance().execute("gettext", getRefId());
 	}
 
 }

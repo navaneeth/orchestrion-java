@@ -1,6 +1,5 @@
-package com.thoughtworks.automation.windows.controls;
+package com.thoughtworks.automation.orchestrion;
 
-import com.thoughtworks.automation.windows.RemoteServer;
 
 /**
  * Represents a combobox.

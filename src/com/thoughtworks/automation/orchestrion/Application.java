@@ -1,6 +1,5 @@
-package com.thoughtworks.automation.windows;
+package com.thoughtworks.automation.orchestrion;
 
-import com.thoughtworks.automation.windows.controls.Window;
 
 public class Application {
 
