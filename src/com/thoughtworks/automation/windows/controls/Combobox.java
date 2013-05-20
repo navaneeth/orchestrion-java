@@ -6,7 +6,7 @@ import com.thoughtworks.automation.windows.RemoteServer;
  * Represents a combobox.
  *
  */
-public class Combobox extends Control {
+public class Combobox extends ListControl {
 
 	/**
 	 * Creates a new combobox instance

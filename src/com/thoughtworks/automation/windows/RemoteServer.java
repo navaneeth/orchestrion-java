@@ -44,12 +44,16 @@ public class RemoteServer {
 	public int executeAndGetId(String command, int refId, By by, String... parameters)
 			throws Exception {
 		String result = execute(command, refId, by, parameters);
+		if (result.isEmpty()) {
+			throw new RefIdNotAvailableException();
+		}
+		
 		try {
 			int id = Integer.parseInt(result);
 			return id;
 		}
 		catch(NumberFormatException ex) {
-			throw new RuntimeException("Failed to get an id from remote the server");
+			throw new RuntimeException("Failed to get an id from remote the server", ex);
 		}
 	}
 	
