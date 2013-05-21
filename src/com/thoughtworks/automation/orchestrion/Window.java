@@ -50,5 +50,14 @@ public class Window extends UIItem {
 		int id = RemoteServer.instance().executeAndGetId("getlistbox", getRefId(), by, by.getValue());
 		return new ListBox(id, getRefId());
 	}
+	
+	public TextBox getTextBox(By by) throws Exception {
+		if (by == null) {
+			throw new IllegalArgumentException("by");
+		}
+		
+		int id = RemoteServer.instance().executeAndGetId("gettextbox", getRefId(), by, by.getValue());
+		return new TextBox(id, getRefId());
+	}
 
 }
