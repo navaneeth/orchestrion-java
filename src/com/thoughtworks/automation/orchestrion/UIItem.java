@@ -1,31 +1,33 @@
 package com.thoughtworks.automation.orchestrion;
 
 public abstract class UIItem implements IUIItem {
-	
+
 	private final int refId;
 
 	public UIItem(int refId) {
 		this.refId = refId;
 	}
-	
+
 	protected int getRefId() {
 		return refId;
 	}
-	
+
 	/**
 	 * Gets a value indicating whether the user can interact with the control
 	 */
 	public boolean isEnabled() throws Exception {
-		return Boolean.parseBoolean(RemoteServer.instance().execute("isenabled", getRefId()));
+		return Boolean.parseBoolean(RemoteServer.instance().execute(
+				"isenabled", getRefId()));
 	}
-	
+
 	/**
 	 * Gets a value indicating whether the user can see the control
 	 */
 	public boolean isVisible() throws Exception {
-		return Boolean.parseBoolean(RemoteServer.instance().execute("isvisible", getRefId()));
+		return Boolean.parseBoolean(RemoteServer.instance().execute(
+				"isvisible", getRefId()));
 	}
-	
+
 	/**
 	 * Gets a value indicating if the item is off screen
 	 * 
@@ -33,9 +35,10 @@ public abstract class UIItem implements IUIItem {
 	 * @throws Exception
 	 */
 	public boolean isOffScreen() throws Exception {
-		return Boolean.parseBoolean(RemoteServer.instance().execute("isoffscreen", getRefId()));
+		return Boolean.parseBoolean(RemoteServer.instance().execute(
+				"isoffscreen", getRefId()));
 	}
-	
+
 	/**
 	 * Gets a value indicating whether the element is focused
 	 * 
@@ -43,18 +46,50 @@ public abstract class UIItem implements IUIItem {
 	 * @throws Exception
 	 */
 	public boolean isFocused() throws Exception {
-		return Boolean.parseBoolean(RemoteServer.instance().execute("isfocused", getRefId()));
+		return Boolean.parseBoolean(RemoteServer.instance().execute(
+				"isfocused", getRefId()));
+	}
+
+	/**
+	 * Gets a value indicating whether this item can be scrolled
+	 * 
+	 * @return
+	 * @throws Exception
+	 */
+	public boolean canScroll() throws Exception {
+		return Boolean.parseBoolean(RemoteServer.instance().execute(
+				"canscroll", getRefId()));
 	}
 	
+	public HScrollBar getHorizontalScrollBar() throws Exception {
+		try {
+			int id = RemoteServer.instance().executeAndGetId("gethscrollbar", getRefId());
+			return new HScrollBar(id);
+		}
+		catch(RefIdNotAvailableException e) {
+			return null;
+		}
+	}
+	
+	public VScrollBar getVerticalScrollBar() throws Exception {
+		try {
+			int id = RemoteServer.instance().executeAndGetId("getvscrollbar", getRefId());
+			return new VScrollBar(id);
+		}
+		catch(RefIdNotAvailableException e) {
+			return null;
+		}
+	}
+
 	/**
-	 * Set this control as focused 
+	 * Set this control as focused
 	 * 
 	 * @throws Exception
 	 */
 	public void setFocus() throws Exception {
 		RemoteServer.instance().execute("setfocus", getRefId());
 	}
-	
+
 	/**
 	 * Perform a mouse click
 	 * 
@@ -62,7 +97,7 @@ public abstract class UIItem implements IUIItem {
 	public void click() throws Exception {
 		RemoteServer.instance().execute("click", getRefId());
 	}
-	
+
 	/**
 	 * Perform a double click
 	 * 
@@ -70,14 +105,14 @@ public abstract class UIItem implements IUIItem {
 	public void doubleClick() throws Exception {
 		RemoteServer.instance().execute("doubleclick", getRefId());
 	}
-	
+
 	/**
 	 * Perform a right click
 	 */
 	public void rightClick() throws Exception {
 		RemoteServer.instance().execute("rightclick", getRefId());
 	}
-	
+
 	/**
 	 * Gets the name of the item
 	 */

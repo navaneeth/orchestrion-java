@@ -51,13 +51,20 @@ public class Window extends UIItem {
 		return new ListBox(id, getRefId());
 	}
 	
-	public TextBox getTextBox(By by) throws Exception {
+	public TextBox getTextBox(By by, boolean multiline) throws Exception {
 		if (by == null) {
 			throw new IllegalArgumentException("by");
 		}
 		
-		int id = RemoteServer.instance().executeAndGetId("gettextbox", getRefId(), by, by.getValue());
+		int id;
+		if (multiline) {
+			id = RemoteServer.instance().executeAndGetId("getmultilinetextbox", getRefId(), by, by.getValue());
+		}
+		else {
+			id = RemoteServer.instance().executeAndGetId("gettextbox", getRefId(), by, by.getValue());
+		}
+		
 		return new TextBox(id, getRefId());
-	}
+	}	
 
 }
