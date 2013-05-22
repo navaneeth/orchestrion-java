@@ -21,7 +21,7 @@ public class ListItems {
 	
 	public ListItem get(int index) throws Exception {
 		try {
-			int id = RemoteServer.instance().executeAndGetId("getlistitembyindex", refId, String.format("%d", index));
+			int id = RemoteServer.instance().executeAndGetId("getitembyindex", refId, String.format("%d", index));
 			return new ListItem(id);
 		}
 		catch(RefIdNotAvailableException e) {
@@ -31,7 +31,7 @@ public class ListItems {
 	
 	public ListItem get(String text) throws Exception {
 		try {
-			int id = RemoteServer.instance().executeAndGetId("getlistitembytext", refId, text);
+			int id = RemoteServer.instance().executeAndGetId("getitembytext", refId, text);
 			return new ListItem(id);
 		}
 		catch(RefIdNotAvailableException e) {
@@ -40,7 +40,7 @@ public class ListItems {
 	}
 	
 	public int count() throws Exception {
-		String result = RemoteServer.instance().execute("getlistitemscount", refId);
+		String result = RemoteServer.instance().execute("getitemscount", refId);
 		return Integer.parseInt(result);
 	}
 

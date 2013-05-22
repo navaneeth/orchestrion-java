@@ -10,10 +10,16 @@ public class MenuItem extends Control {
 	public MenuItem getMenuItem(String text) throws Exception {
 		int id = RemoteServer.instance().executeAndGetId("getmenuitem", getRefId(), text);
 		return new MenuItem(id, getWindowId());
-	}
+	}	
 	
-	public void click() throws Exception {
-		RemoteServer.instance().execute("click", getRefId());
+	public MenuItems getChildren() throws Exception {
+		try {
+			int id = RemoteServer.instance().executeAndGetId("getchildren", getRefId());
+			return new MenuItems(id, getWindowId());
+		}
+		catch(RefIdNotAvailableException e) {
+			return null;
+		}
 	}
 	
 }
