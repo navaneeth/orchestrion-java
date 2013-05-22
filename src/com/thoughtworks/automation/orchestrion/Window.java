@@ -65,6 +65,20 @@ public class Window extends UIItem {
 		}
 		
 		return new TextBox(id, getRefId());
-	}	
+	}
+	
+	public MessageBox getMessageBox(String title) throws Exception {
+		if (title == null) {
+			throw new IllegalArgumentException("title");
+		}
+				
+		try {
+			int id = RemoteServer.instance().executeAndGetId("getmessagebox", getRefId(), title);
+			return new MessageBox(id);			
+		}
+		catch (RefIdNotAvailableException e) {
+			return null;
+		}
+	}
 
 }
