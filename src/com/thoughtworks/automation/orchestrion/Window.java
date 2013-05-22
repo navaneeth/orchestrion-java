@@ -67,6 +67,15 @@ public class Window extends UIItem {
 		return new TextBox(id, getRefId());
 	}
 	
+	public Label getLabel(By by) throws Exception {
+		if (by == null) {
+			throw new IllegalArgumentException("by");
+		}
+		
+		int id = RemoteServer.instance().executeAndGetId("getlabel", getRefId(), by, by.getValue());
+		return new Label(id, getRefId());
+	}
+	
 	public MessageBox getMessageBox(String title) throws Exception {
 		if (title == null) {
 			throw new IllegalArgumentException("title");
