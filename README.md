@@ -1,4 +1,4 @@
-winautomation-java
+orchestrion-java
 ==================
 
-Java client for the automation server (https://github.com/navaneeth/automation-server).
+Java client for the orchestrion project (https://github.com/navaneeth/orchestrion).
