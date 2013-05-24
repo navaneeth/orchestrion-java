@@ -50,7 +50,7 @@ public class Tree extends Control {
 			return null;
 		}
 	}
-	
+
 	/**
 	 * Gets a node which has the given text
 	 * 
@@ -59,8 +59,43 @@ public class Tree extends Control {
 	 * @throws Exception
 	 */
 	public TreeNode getNode(String nodeText) throws Exception {
-		int id = RemoteServer.instance().executeAndGetId("getnode", getRefId(), nodeText);
+		int id = RemoteServer.instance().executeAndGetId("getnode", getRefId(),
+				nodeText);
 		return new TreeNode(id);
+	}
+
+	/**
+	 * Expands all the child nodes
+	 * 
+	 * @throws Exception
+	 */
+	public void expandAll() throws Exception {
+		TreeNodes allNodes = getNodes();
+		if (allNodes == null) {
+			return;
+		}
+
+		for (int i = 0; i < allNodes.count(); i++) {
+			TreeNode treeNode = allNodes.get(i);
+			treeNode.expandAll();
+		}
+	}
+
+	/**
+	 * Collapse all the child nodes
+	 * 
+	 * @throws Exception
+	 */
+	public void collapseAll() throws Exception {
+		TreeNodes allNodes = getNodes();
+		if (allNodes == null) {
+			return;
+		}
+
+		for (int i = 0; i < allNodes.count(); i++) {
+			TreeNode treeNode = allNodes.get(i);
+			treeNode.collapseAll();
+		}
 	}
 
 }
