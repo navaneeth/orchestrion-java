@@ -76,6 +76,15 @@ public class Window extends UIItem {
 		return new Label(id, getRefId());
 	}
 	
+	public Tree getTree(By by) throws Exception {
+		if (by == null) {
+			throw new IllegalArgumentException("by");
+		}
+		
+		int id = RemoteServer.instance().executeAndGetId("gettree", getRefId(), by, by.getValue());
+		return new Tree(id, getRefId());
+	}
+	
 	public MessageBox getMessageBox(String title) throws Exception {
 		if (title == null) {
 			throw new IllegalArgumentException("title");

@@ -1,17 +1,24 @@
 package com.thoughtworks.automation.orchestrion;
 
-
-public class ListItems {
+/**
+ * Represents a collection of list items
+ *
+ */
+public class ListItems extends UIItemCollection<ListItem> {
 	
-	private final int refId;
-
 	public ListItems(int refId) {
-		this.refId = refId;
+		super(refId);
 	}
 	
+	/**
+	 * Gets the selected list item from the collection of all list items
+	 * 
+	 * @return
+	 * @throws Exception
+	 */
 	public ListItem getSelectedItem() throws Exception {
 		try {
-			int id = RemoteServer.instance().executeAndGetId("getselecteditem", refId);
+			int id = RemoteServer.instance().executeAndGetId("getselecteditem", getRefId());
 			return new ListItem(id);
 		}
 		catch(RefIdNotAvailableException e) {
@@ -19,29 +26,26 @@ public class ListItems {
 		}
 	}
 	
-	public ListItem get(int index) throws Exception {
-		try {
-			int id = RemoteServer.instance().executeAndGetId("getitembyindex", refId, String.format("%d", index));
-			return new ListItem(id);
-		}
-		catch(RefIdNotAvailableException e) {
-			return null;
-		}
-	}
-	
+	/**
+	 * Gets the item based on the text
+	 * 
+	 * @param text
+	 * @return
+	 * @throws Exception
+	 */
 	public ListItem get(String text) throws Exception {
 		try {
-			int id = RemoteServer.instance().executeAndGetId("getitembytext", refId, text);
+			int id = RemoteServer.instance().executeAndGetId("getitembytext", getRefId(), text);
 			return new ListItem(id);
 		}
 		catch(RefIdNotAvailableException e) {
 			return null;
 		}
 	}
-	
-	public int count() throws Exception {
-		String result = RemoteServer.instance().execute("getitemscount", refId);
-		return Integer.parseInt(result);
+
+	@Override
+	protected ListItem createInstance(int refId) {
+		return new ListItem(refId);
 	}
 
 }

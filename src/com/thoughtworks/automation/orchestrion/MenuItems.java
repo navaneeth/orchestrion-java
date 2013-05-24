@@ -1,28 +1,18 @@
 package com.thoughtworks.automation.orchestrion;
 
-public final class MenuItems {
-	
-	private final int refId;
-	private final int windowId;
+/**
+ * Represents a collection of menu item
+ * 
+ */
+public final class MenuItems extends UIItemCollection<MenuItem> {
 
-	public MenuItems(int refId, int windowId) {
-		this.refId = refId;
-		this.windowId = windowId;
+	public MenuItems(int refId) {
+		super(refId);
 	}
-	
-	public MenuItem get(int index) throws Exception {
-		try {
-			int id = RemoteServer.instance().executeAndGetId("getitembyindex", refId, String.format("%d", index));
-			return new MenuItem(id, windowId);
-		}
-		catch(RefIdNotAvailableException e) {
-			return null;
-		}
-	}
-	
-	public int count() throws Exception {
-		String result = RemoteServer.instance().execute("getitemscount", refId);
-		return Integer.parseInt(result);
+
+	@Override
+	protected MenuItem createInstance(int refId) {
+		return new MenuItem(refId);
 	}
 
 }

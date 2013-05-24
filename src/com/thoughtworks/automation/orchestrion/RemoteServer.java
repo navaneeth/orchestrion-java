@@ -9,7 +9,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
 
-public class RemoteServer {
+class RemoteServer {
 	
 	private static RemoteServer _instance = null; 
 	public static void initialize(int port, int connectTimeout) {

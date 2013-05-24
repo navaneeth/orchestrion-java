@@ -9,7 +9,7 @@ public class MenuBar extends Control {
 	
 	public MenuItem getMenuItem(String text) throws Exception {
 		int id = RemoteServer.instance().executeAndGetId("getmenuitem", getRefId(), text);
-		return new MenuItem(id, getWindowId());
+		return new MenuItem(id);
 	}
 
 }
