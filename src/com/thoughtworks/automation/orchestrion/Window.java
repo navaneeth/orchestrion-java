@@ -98,5 +98,14 @@ public class Window extends UIItem {
 			return null;
 		}
 	}
+	
+	public ProgressBar geProgressBar(By by) throws Exception {
+		if (by == null) {
+			throw new IllegalArgumentException("by");
+		}
+		
+		int id = RemoteServer.instance().executeAndGetId("getprogressbar", getRefId(), by, by.getValue());
+		return new ProgressBar(id);
+	}
 
 }
