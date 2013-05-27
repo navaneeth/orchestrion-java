@@ -41,7 +41,7 @@ public class ListItem extends UIItem {
 	 * @throws Exception
 	 */
 	public void select() throws Exception {
-		RemoteServer.instance().execute("selectlistitem", getRefId());
+		RemoteServer.instance().execute("select", getRefId());
 	}
 	
 	/**

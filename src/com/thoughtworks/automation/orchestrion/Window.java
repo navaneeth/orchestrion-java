@@ -44,6 +44,16 @@ public class Window extends UIItem {
 				getRefId(), by, by.getValue());
 		return new CheckBox(id, getRefId());
 	}
+	
+	public RadioButton getRadioButton(By by) throws Exception {
+		if (by == null) {
+			throw new IllegalArgumentException("by");
+		}
+
+		int id = RemoteServer.instance().executeAndGetId("getradiobutton",
+				getRefId(), by, by.getValue());
+		return new RadioButton(id, getRefId());
+	}
 
 	public Combobox getComboBox(By by) throws Exception {
 		if (by == null) {
