@@ -13,7 +13,7 @@ public class ListItem extends UIItem {
 	 * @throws Exception
 	 */
 	public void check() throws Exception {
-		RemoteServer.instance().execute("checklistitem", getRefId());
+		RemoteServer.instance().execute("check", getRefId());
 	}
 	
 	/**
@@ -22,7 +22,7 @@ public class ListItem extends UIItem {
 	 * @throws Exception
 	 */
 	public void uncheck() throws Exception {
-		RemoteServer.instance().execute("unchecklistitem", getRefId());
+		RemoteServer.instance().execute("uncheck", getRefId());
 	}
 	
 	/**
