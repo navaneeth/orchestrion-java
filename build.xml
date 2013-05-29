@@ -10,6 +10,8 @@
 	<property name="jar.file" value="${jar.dir}/${ant.project.name}-${version}.jar" />
 	<property name="doc.dir" value="${build.dir}/javadoc" />
 	<property name="doc.jar" value="${jar.dir}/${ant.project.name}-${version}-javadoc.jar" />
+	<property name="distro.dir" value="${build.dir}/${ant.project.name}-${version}" />
+	<property name="distro.file" value="${build.dir}/${ant.project.name}-${version}.zip" />
 
 	<target name="clean">
 		<delete dir="${build.dir}" />
@@ -42,6 +44,16 @@
 
 		<jar destfile="${doc.jar}" basedir="${doc.dir}" />
 
+	</target>
+	
+	<target name="distro" depends="jar">
+		<mkdir dir="${distro.dir}" />
+		<copy file="${jar.file}" todir="${distro.dir}" />
+		<copy file="${doc.jar}" todir="${distro.dir}" />
+		<copy file="LICENSE.txt" todir="${distro.dir}" />
+		<copy file="README.md" todir="${distro.dir}" />
+		<copy file="CONTRIBUTORS.txt" todir="${distro.dir}" />
+		<zip basedir="${distro.dir}" includes="**" destfile="${distro.file}" />
 	</target>
 
 </project>
