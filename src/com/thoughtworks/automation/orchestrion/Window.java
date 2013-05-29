@@ -4,12 +4,7 @@ public class Window extends UIItem {
 
 	public Window(int refId) {
 		super(refId);
-	}
-
-	public void enterText(String text) throws Exception {
-		RemoteServer.instance().execute("entertext", getRefId(), text,
-				String.format("%d", getRefId()));
-	}
+	}	
 
 	public MenuBar getMenuBar() throws Exception {
 		int id = RemoteServer.instance().executeAndGetId("getmenubar",
@@ -153,6 +148,18 @@ public class Window extends UIItem {
 		} catch (RefIdNotAvailableException e) {
 			return null;
 		}
+	}
+	
+	/**
+	 * Waits till the processing finishes
+	 * 
+	 *  This is useful when some methods are asynchronous and you need to wait till the operation 
+	 *  completes.
+	 * 
+	 * @throws Exception
+	 */
+	public void waitWhileBusy() throws Exception {
+		RemoteServer.instance().execute("waitwhilebusy", getRefId());
 	}
 
 }

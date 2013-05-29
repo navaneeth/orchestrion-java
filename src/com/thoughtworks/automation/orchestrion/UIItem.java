@@ -10,7 +10,7 @@ public abstract class UIItem implements IUIItem {
 
 	protected int getRefId() {
 		return refId;
-	}
+	}	
 
 	/**
 	 * Gets a value indicating whether the user can interact with the control
@@ -118,6 +118,16 @@ public abstract class UIItem implements IUIItem {
 	 */
 	public String getName() throws Exception {
 		return RemoteServer.instance().execute("getname", getRefId());
+	}
+	
+	/**
+	 * Enters the specified text into the UIItem. This method is asynchronous and it may return before the text is set
+	 * 
+	 * @param text Text to enter
+	 * @throws Exception
+	 */
+	public void enter(String text) throws Exception {
+		RemoteServer.instance().execute("enter", getRefId(), text);
 	}
 
 }
