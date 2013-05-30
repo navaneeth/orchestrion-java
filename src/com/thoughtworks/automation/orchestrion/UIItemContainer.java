@@ -184,5 +184,15 @@ public abstract class UIItemContainer extends UIItem {
 				getRefId(), by, by.getValue());
 		return new Panel(id);
 	}
+	
+	public Spinner getSpinner(By by) throws Exception {
+		if (by == null) {
+			throw new IllegalArgumentException("by");
+		}
+
+		int id = RemoteServer.instance().executeAndGetId("getspinner",
+				getRefId(), by, by.getValue());
+		return new Spinner(id, getRefId());
+	}
 
 }
