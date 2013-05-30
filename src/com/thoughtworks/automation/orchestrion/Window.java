@@ -160,6 +160,16 @@ public class Window extends UIItem {
 		return new Slider(id, getRefId());
 	}
 	
+	public Hyperlink getHyperlink(By by) throws Exception {
+		if (by == null) {
+			throw new IllegalArgumentException("by");
+		}
+
+		int id = RemoteServer.instance().executeAndGetId("gethyperlink",
+				getRefId(), by, by.getValue());
+		return new Hyperlink(id, getRefId());
+	}
+	
 	/**
 	 * Waits till the processing finishes
 	 * 
