@@ -11,19 +11,7 @@ public abstract class UIItemContainer extends UIItem {
 	
 	public UIItemContainer(int refId) {
 		super(refId);
-	}
-	
-	/**
-	 * Returns the default menu bar associated within this window
-	 * 
-	 * @return
-	 * @throws Exception
-	 */
-	public MenuBar getMenuBar() throws Exception {
-		int id = RemoteServer.instance().executeAndGetId("getmenubar",
-				getRefId());
-		return new MenuBar(id, getRefId());
-	}
+	}	
 
 	public Button getButton(By by) throws Exception {
 		if (by == null) {
@@ -110,21 +98,7 @@ public abstract class UIItemContainer extends UIItem {
 		int id = RemoteServer.instance().executeAndGetId("gettree", getRefId(),
 				by, by.getValue());
 		return new Tree(id, getRefId());
-	}
-
-	public MessageBox getMessageBox(String title) throws Exception {
-		if (title == null) {
-			throw new IllegalArgumentException("title");
-		}
-
-		try {
-			int id = RemoteServer.instance().executeAndGetId("getmessagebox",
-					getRefId(), title);
-			return new MessageBox(id);
-		} catch (RefIdNotAvailableException e) {
-			return null;
-		}
-	}
+	}	
 
 	public ProgressBar getProgressBar(By by) throws Exception {
 		if (by == null) {
@@ -134,26 +108,7 @@ public abstract class UIItemContainer extends UIItem {
 		int id = RemoteServer.instance().executeAndGetId("getprogressbar",
 				getRefId(), by, by.getValue());
 		return new ProgressBar(id);
-	}
-
-	public Window getModalWindow(By by) throws Exception {
-		if (by == null) {
-			throw new IllegalArgumentException("by");
-		}
-
-		int id = RemoteServer.instance().executeAndGetId("getmodalwindow",
-				getRefId(), by, by.getValue());
-		return new Window(id);
-	}
-
-	public Windows getModalWindows() throws Exception {		
-		try {
-			int id = RemoteServer.instance().executeAndGetId("getmodalwindows", getRefId());
-			return new Windows(id);
-		} catch (RefIdNotAvailableException e) {
-			return null;
-		}
-	}
+	}	
 	
 	public Slider getSlider(By by) throws Exception {
 		if (by == null) {
@@ -193,6 +148,16 @@ public abstract class UIItemContainer extends UIItem {
 		int id = RemoteServer.instance().executeAndGetId("getspinner",
 				getRefId(), by, by.getValue());
 		return new Spinner(id, getRefId());
+	}
+	
+	public GroupBox getGroupBox(By by) throws Exception {
+		if (by == null) {
+			throw new IllegalArgumentException("by");
+		}
+
+		int id = RemoteServer.instance().executeAndGetId("getgroupbox",
+				getRefId(), by, by.getValue());
+		return new GroupBox(id);
 	}
 
 }
