@@ -8,7 +8,7 @@ public abstract class UIItem implements IUIItem {
 		this.refId = refId;
 	}
 
-	protected int getRefId() {
+	public int getRefId() {
 		return refId;
 	}	
 
