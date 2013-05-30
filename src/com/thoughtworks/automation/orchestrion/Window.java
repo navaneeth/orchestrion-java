@@ -150,6 +150,16 @@ public class Window extends UIItem {
 		}
 	}
 	
+	public Slider getSlider(By by) throws Exception {
+		if (by == null) {
+			throw new IllegalArgumentException("by");
+		}
+
+		int id = RemoteServer.instance().executeAndGetId("getslider",
+				getRefId(), by, by.getValue());
+		return new Slider(id, getRefId());
+	}
+	
 	/**
 	 * Waits till the processing finishes
 	 * 
