@@ -89,8 +89,16 @@ public abstract class UIItemContainer extends UIItem {
 				getRefId(), by, by.getValue());
 		return new ListBox(id, getRefId());
 	}
+	
+	public TextBox getTextBox(By by) throws Exception{
+		return getTextBox(by, false);
+	}
+	
+	public TextBox getMultiLineTextBox(By by) throws Exception{
+		return getTextBox(by, true);
+	}
 
-	public TextBox getTextBox(By by, boolean multiline) throws Exception {
+	private TextBox getTextBox(By by, boolean multiline) throws Exception {
 		if (by == null) {
 			throw new IllegalArgumentException("by");
 		}
