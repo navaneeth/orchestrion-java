@@ -138,19 +138,26 @@ public abstract class UIItemContainer extends UIItem {
 				getRefId(), by, by.getValue());
 		return new ListBox(id, getRefId());
 	}
-
+	
+	
 	/**
 	 * Gets a TextBox by the search criteria
 	 * 
 	 * @param by
 	 *            condition to locate element
-	 * @param multiline
-	 *            set this to true when looking for multiline textbox
 	 * @return
 	 * @throws Exception
 	 * @see TextBox
 	 */
-	public TextBox getTextBox(By by, boolean multiline) throws Exception {
+	public TextBox getTextBox(By by) throws Exception{
+		return getTextBox(by, false);
+	}
+	
+	public TextBox getMultiLineTextBox(By by) throws Exception{
+		return getTextBox(by, true);
+	}
+
+	private TextBox getTextBox(By by, boolean multiline) throws Exception {
 		if (by == null) {
 			throw new IllegalArgumentException("by");
 		}
