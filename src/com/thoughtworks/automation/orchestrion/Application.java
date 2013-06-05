@@ -89,5 +89,21 @@ public final class Application {
 	public void waitWhileBusy() throws Exception {
 		RemoteServer.instance().execute("waitwhilebusy", refId);
 	}
+	
+	/**
+	 * Gets all the windows which are open in the application
+	 * 
+	 * @return list of windows if available, null otherwise
+	 * @throws Exception
+	 */
+	public Windows getAllWindows() throws Exception {
+		try {
+			int id = RemoteServer.instance().executeAndGetId("getwindows",
+					refId);
+			return new Windows(id);
+		} catch (RefIdNotAvailableException e) {
+			return null;
+		}
+	}
 
 }
