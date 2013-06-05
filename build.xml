@@ -19,6 +19,10 @@
 
 	<target name="compile">
 		<mkdir dir="${classes.dir}" />
+		<mkdir dir="${classes.dir}/orchestrion" />
+		<copy todir="${classes.dir}/orchestrion">
+			<fileset dir="orchestrion" includes="**" excludes="README.txt" />
+		</copy>
 		<javac srcdir="src" destdir="${classes.dir}" />
 	</target>
 
@@ -45,7 +49,7 @@
 		<jar destfile="${doc.jar}" basedir="${doc.dir}" />
 
 	</target>
-	
+
 	<target name="distro" depends="jar">
 		<mkdir dir="${distro.dir}" />
 		<copy file="${jar.file}" todir="${distro.dir}" />

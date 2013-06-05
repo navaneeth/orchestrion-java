@@ -133,4 +133,8 @@ class RemoteServer {
 		return builder.toString();
 	}
 
+	public void quit() throws Exception {
+		execute("quit", 0);
+	}
+
 }
