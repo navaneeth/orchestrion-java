@@ -3,10 +3,13 @@
  */
 package com.thoughtworks.automation.orchestrion;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
 
 /**
  * Manages orchestrion test environment
@@ -14,10 +17,15 @@ import java.io.InputStream;
  */
 public final class Orchestrion {
 
+	private final int NOT_SET = -1;
+	private final int DEFAULT_PORT = 8082;
+
 	private File workingDir;
 	private Process orchestrionProcess;
-	private int port = 8082;
-	private int timeoutInMs = 10000;	
+	private int port = NOT_SET;
+	private int timeoutInMs = 1000;
+	private String host;
+	private File logsDirectory;
 
 	/**
 	 * Sets the port which orchestrion test environment will be hosted
@@ -35,7 +43,83 @@ public final class Orchestrion {
 	 * @return port in use
 	 */
 	public int getPort() {
-		return port;
+		if (this.port == NOT_SET)
+			return DEFAULT_PORT;
+		return this.port;
+	}
+
+	/**
+	 * Sets the host name
+	 * 
+	 * @param host
+	 *            host name to set
+	 * @return
+	 */
+	public void setHost(String host) {
+		this.host = host;
+	}
+
+	/**
+	 * Gets the current host value
+	 * 
+	 * @return
+	 */
+	public String getHost() {
+		if (this.host == null)
+			return "localhost";
+
+		return this.host;
+	}
+
+	/**
+	 * Sets the logs directory
+	 * <p>
+	 * Orchestrion writes log files to this directory.
+	 * 
+	 * @param directoryPath
+	 *            Directory path where log files to be written
+	 * @throws OrchestrionException
+	 *             If directoryPath is not writable
+	 */
+	public void setLogsDirectory(String directoryPath)
+			throws OrchestrionException {
+		File logsDirectory = new File(directoryPath);
+		if (!isDirectoryAvailable(logsDirectory))
+			throw new OrchestrionException(directoryPath + " is invalid", null);
+
+		if (!canWriteToDirectory(logsDirectory))
+			throw new OrchestrionException(directoryPath + " is not writable",
+					null);
+
+		this.logsDirectory = logsDirectory;
+	}
+
+	/**
+	 * Gets the logs directory
+	 * 
+	 * @return
+	 */
+	public String getLogsDirectory() {
+		if (logsDirectory != null)
+			return logsDirectory.getAbsolutePath();
+
+		return null;
+	}
+
+	private boolean isDirectoryAvailable(File dir) {
+		try {
+			return dir.isDirectory();
+		} catch (SecurityException e) {
+			return false;
+		}
+	}
+
+	private boolean canWriteToDirectory(File dir) {
+		try {
+			return dir.canWrite();
+		} catch (SecurityException e) {
+			return false;
+		}
 	}
 
 	/**
@@ -98,15 +182,78 @@ public final class Orchestrion {
 					workingDirectory), null);
 
 		try {
-			orchestrionProcess = Runtime.getRuntime().exec(
-					workingDir.getAbsolutePath() + "/orchestrion.exe");
-			// TODO : Handle exit values here
+			String[] commandLineArgs = getCommandLineArgs();
+			ProcessBuilder pb = new ProcessBuilder(commandLineArgs);
+			orchestrionProcess = pb.start();
+			RemoteServer.initialize(getPort(), timeoutInMs, getHost());
 
-			RemoteServer.initialize(port, timeoutInMs);
+			int tries = 0;
+			final int maxTries = 3;
+			boolean pingSuccess = false;
+			while (tries++ < maxTries) {
+				try {
+					RemoteServer.instance().ping();
+					pingSuccess = true;
+					break;
+				} catch (Exception e) {
+					// Looks like process is not yet ready
+					Thread.sleep(50);
+				}
+			}
+
+			if (!pingSuccess) {
+				int exitValue = orchestrionProcess.exitValue();
+				BufferedReader reader = new BufferedReader(
+						new InputStreamReader(
+								orchestrionProcess.getErrorStream()));
+				String line = null;
+				StringBuilder errorMessage = new StringBuilder();
+				while ((line = reader.readLine()) != null) {
+					errorMessage.append(line);
+				}
+				reader.close();
+				throw new OrchestrionException(
+						"Can't start orchestrion test environment."
+								+ errorMessage.toString(), null);
+			}
+
 		} catch (IOException e) {
 			throw new OrchestrionException(
 					"Can't start orchestrion test environment.", e);
+		} catch (InterruptedException e) {
+			throw new OrchestrionException(
+					"Can't start orchestrion test environment.", e);
+		} catch (IllegalThreadStateException e) {
+			// process is still running, but ping failed.
+			// It could be listening on a wrong host for eg
+			orchestrionProcess.destroy();
+			throw new OrchestrionException(
+					"Can't start orchestrion test environment. Failed to establish connection.",
+					null);
 		}
+	}
+
+	private String[] getCommandLineArgs() {
+		ArrayList<String> commands = new ArrayList<String>();
+		commands.add(workingDir.getAbsolutePath() + File.separator
+				+ "orchestrion.exe");
+
+		if (getPort() != NOT_SET) {
+			commands.add("--port");
+			commands.add(String.format("%d", getPort()));
+		}
+
+		if (getHost() != null && !getHost().isEmpty()) {
+			commands.add("--host");
+			commands.add(getHost());
+		}
+
+		if (getLogsDirectory() != null && !getLogsDirectory().isEmpty()) {
+			commands.add("--logs");
+			commands.add(getLogsDirectory());
+		}
+
+		return commands.toArray(new String[commands.size()]);
 	}
 
 	/**

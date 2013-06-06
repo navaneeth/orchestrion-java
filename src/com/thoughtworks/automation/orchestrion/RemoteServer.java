@@ -12,25 +12,26 @@ import java.net.URLEncoder;
 class RemoteServer {
 	
 	private static RemoteServer _instance = null; 
-	public static void initialize(int port, int connectTimeout) {
-		_instance = new RemoteServer(port, connectTimeout);		
+	public static void initialize(int port, int connectTimeout, String host) {
+		_instance = new RemoteServer(port, connectTimeout, host);		
 	}
 	
 	public static RemoteServer instance() {
 		if (_instance == null) {
-			initialize(8082, 10000);
+			initialize(8082, 10000, "localhost");
 		}
 		
 		return _instance;
 	}
 	
-	private final int port;
-	private String serverURL = "http://localhost";
+	private final int port;	
 	private final int connectTimeout;
+	private final String host;
 
-	public RemoteServer(int port, int connectTimeout) {
+	public RemoteServer(int port, int connectTimeout, String host) {
 		this.port = port;
 		this.connectTimeout = connectTimeout;
+		this.host = host;
 	}
 
 	public int executeAndGetId(String command, int refId) throws Exception {
@@ -76,7 +77,7 @@ class RemoteServer {
 		}
 
 		StringBuilder requestURL = new StringBuilder();
-		requestURL.append(String.format("%s:%d/?command=%s", serverURL, port,
+		requestURL.append(String.format("http://%s:%d/?command=%s", host, port,
 				utf8URLEncode(command)));
 		if (refId > 0) {
 			requestURL.append(String.format("&ref=%d", refId));
@@ -135,6 +136,12 @@ class RemoteServer {
 
 	public void quit() throws Exception {
 		execute("quit", 0);
+	}
+
+	public void ping() throws Exception {
+		String result = execute("ping", 0);
+		if (!"pong".equals(result))
+			throw new OrchestrionException("Ping failed", null);
 	}
 
 }
