@@ -3,6 +3,8 @@
  */
 package com.thoughtworks.automation.orchestrion;
 
+import java.util.ArrayList;
+
 /**
  * Represents a keyboard attached to the UIItem
  *
@@ -10,6 +12,7 @@ package com.thoughtworks.automation.orchestrion;
 public final class Keyboard {
 	
 	private final int refId;
+	private final ArrayList<SpecialKeys> heldKeys = new ArrayList<SpecialKeys>();
 
 	Keyboard(int refId) {
 		this.refId = refId;
@@ -43,6 +46,7 @@ public final class Keyboard {
 	 */
 	public void holdSpecialKey(SpecialKeys key) throws Exception {
 		RemoteServer.instance().execute("holdspecialkey", refId, String.format("%d", key.getCode()));
+		heldKeys.add(key);
 	}
 	
 	/**
@@ -53,6 +57,18 @@ public final class Keyboard {
 	 */
 	public void releaseSpecialKey(SpecialKeys key) throws Exception {
 		RemoteServer.instance().execute("releasespecialkey", refId, String.format("%d", key.getCode()));
+		heldKeys.remove(key);
+	}
+	
+	/**
+	 * Releases all the keys which are in hold state
+	 * 
+	 * @throws Exception
+	 */
+	public void releaseAllKeys() throws Exception {
+		while(heldKeys.size() > 0) {
+			releaseSpecialKey(heldKeys.get(0));
+		}
 	}
 	
 	/**

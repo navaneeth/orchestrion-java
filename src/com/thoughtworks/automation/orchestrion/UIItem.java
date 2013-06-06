@@ -122,6 +122,8 @@ public abstract class UIItem implements IUIItem {
 	
 	/**
 	 * Enters the specified text into the UIItem. This method is asynchronous and it may return before the text is set
+	 * <p>
+	 * Use waitWhileBusy() on the Window to wait till the operation completes
 	 * 
 	 * @param text Text to enter
 	 * @throws Exception
