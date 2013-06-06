@@ -9,25 +9,32 @@ package com.thoughtworks.automation.orchestrion;
  */
 public abstract class UIItemContainer extends UIItem {
 
+	private Keyboard keyboard;
+	private Mouse mouse;
+
 	public UIItemContainer(int refId) {
 		super(refId);
 	}
 
 	/**
-	 * Gets the keyboard instance
+	 * Gets the keyboard instance.
 	 * 
 	 * @return keyboard
 	 * @throws Exception
 	 * @see Keyboard
 	 */
 	public Keyboard getKeyBoard() throws Exception {
-		try {
-			int id = RemoteServer.instance().executeAndGetId("getkeyboard",
-					getRefId());
-			return new Keyboard(id);
-		} catch (RefIdNotAvailableException e) {
-			return null;
+		if (keyboard == null) {
+			try {
+				int id = RemoteServer.instance().executeAndGetId("getkeyboard",
+						getRefId());
+				keyboard = new Keyboard(id);
+			} catch (RefIdNotAvailableException e) {
+				keyboard = null;
+			}
 		}
+
+		return keyboard;
 	}
 
 	/**
@@ -37,13 +44,17 @@ public abstract class UIItemContainer extends UIItem {
 	 * @throws Exception
 	 */
 	public Mouse getMouse() throws Exception {
-		try {
-			int id = RemoteServer.instance().executeAndGetId("getmouse",
-					getRefId());
-			return new Mouse(id);
-		} catch (RefIdNotAvailableException e) {
-			return null;
+		if (mouse == null) {
+			try {
+				int id = RemoteServer.instance().executeAndGetId("getmouse",
+						getRefId());
+				mouse = new Mouse(id);
+			} catch (RefIdNotAvailableException e) {
+				mouse = null;
+			}
 		}
+
+		return mouse;
 	}
 
 	/**
@@ -138,8 +149,7 @@ public abstract class UIItemContainer extends UIItem {
 				getRefId(), by, by.getValue());
 		return new ListBox(id, getRefId());
 	}
-	
-	
+
 	/**
 	 * Gets a TextBox by the search criteria
 	 * 
@@ -149,11 +159,11 @@ public abstract class UIItemContainer extends UIItem {
 	 * @throws Exception
 	 * @see TextBox
 	 */
-	public TextBox getTextBox(By by) throws Exception{
+	public TextBox getTextBox(By by) throws Exception {
 		return getTextBox(by, false);
 	}
-	
-	public TextBox getMultiLineTextBox(By by) throws Exception{
+
+	public TextBox getMultiLineTextBox(By by) throws Exception {
 		return getTextBox(by, true);
 	}
 
