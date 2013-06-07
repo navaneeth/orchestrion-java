@@ -89,7 +89,7 @@ public final class Application {
 	public void waitWhileBusy() throws Exception {
 		RemoteServer.instance().execute("waitwhilebusy", refId);
 	}
-	
+
 	/**
 	 * Gets all the windows which are open in the application
 	 * 
@@ -103,6 +103,32 @@ public final class Application {
 			return new Windows(id);
 		} catch (RefIdNotAvailableException e) {
 			return null;
+		}
+	}
+
+	/**
+	 * Blocks the current thread until the specified condition is true or a
+	 * timeout period has reached
+	 * 
+	 * @param condition
+	 *            Condition to test for
+	 * @param timeoutInMilliseconds
+	 *            timeout value in milliseconds
+	 * @throws Exception 
+	 */
+	public void waitTill(ICondition condition, long timeoutInMilliseconds)
+			throws Exception {
+		if (condition == null)
+			throw new NullPointerException("condition");
+
+		long start = System.currentTimeMillis();
+		while (!condition.test()) {
+			long elapsed = System.currentTimeMillis();
+			if ((elapsed - start) > timeoutInMilliseconds) {
+				throw new OperationTimedOutException(condition.getName(),
+						timeoutInMilliseconds);
+			}
+			Thread.sleep(1);
 		}
 	}
 
