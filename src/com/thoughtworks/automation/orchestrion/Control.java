@@ -22,16 +22,5 @@ public abstract class Control extends UIItem {
 			return null;
 		}
 	}
-	
-	@Override
-	public void enter(String text) throws Exception {
-		super.enter(text);
-		Window parent = getParentWindow();
-		if (parent != null) {
-			// Enter is asynchronous and we are waiting till the operation
-			// completes
-			parent.waitWhileBusy();
-		}
-	}
 
 }

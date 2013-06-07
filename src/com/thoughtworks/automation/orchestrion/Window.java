@@ -11,12 +11,6 @@ public class Window extends UIItemContainer {
 	Window(int refId) {
 		super(refId);
 	}
-	
-	@Override
-	public void enter(String text) throws Exception {
-		super.enter(text);
-		waitWhileBusy();
-	}
 
 	/**
 	 * Gets the window title

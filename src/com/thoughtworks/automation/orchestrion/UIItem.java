@@ -10,7 +10,7 @@ public abstract class UIItem implements IUIItem {
 
 	public int getRefId() {
 		return refId;
-	}	
+	}
 
 	/**
 	 * Gets a value indicating whether the user can interact with the control
@@ -60,23 +60,23 @@ public abstract class UIItem implements IUIItem {
 		return Boolean.parseBoolean(RemoteServer.instance().execute(
 				"canscroll", getRefId()));
 	}
-	
+
 	public HScrollBar getHorizontalScrollBar() throws Exception {
 		try {
-			int id = RemoteServer.instance().executeAndGetId("gethscrollbar", getRefId());
+			int id = RemoteServer.instance().executeAndGetId("gethscrollbar",
+					getRefId());
 			return new HScrollBar(id);
-		}
-		catch(RefIdNotAvailableException e) {
+		} catch (RefIdNotAvailableException e) {
 			return null;
 		}
 	}
-	
+
 	public VScrollBar getVerticalScrollBar() throws Exception {
 		try {
-			int id = RemoteServer.instance().executeAndGetId("getvscrollbar", getRefId());
+			int id = RemoteServer.instance().executeAndGetId("getvscrollbar",
+					getRefId());
 			return new VScrollBar(id);
-		}
-		catch(RefIdNotAvailableException e) {
+		} catch (RefIdNotAvailableException e) {
 			return null;
 		}
 	}
@@ -119,13 +119,17 @@ public abstract class UIItem implements IUIItem {
 	public String getName() throws Exception {
 		return RemoteServer.instance().execute("getname", getRefId());
 	}
-	
+
 	/**
-	 * Enters the specified text into the UIItem. This method is asynchronous and it may return before the text is set
+	 * Enters the specified text into the UIItem. This method is asynchronous
+	 * and it may return before the text is set. Use it only for sending key
+	 * presses. If you want to set some text to a text box, use setText()
+	 * instead.
 	 * <p>
 	 * Use waitWhileBusy() on the Window to wait till the operation completes
 	 * 
-	 * @param text Text to enter
+	 * @param text
+	 *            Text to enter
 	 * @throws Exception
 	 */
 	public void enter(String text) throws Exception {
