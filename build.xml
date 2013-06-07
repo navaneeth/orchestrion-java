@@ -19,10 +19,6 @@
 
 	<target name="compile">
 		<mkdir dir="${classes.dir}" />
-		<mkdir dir="${classes.dir}/orchestrion" />
-		<copy todir="${classes.dir}/orchestrion">
-			<fileset dir="orchestrion" includes="**" excludes="README.txt" />
-		</copy>
 		<javac srcdir="src" destdir="${classes.dir}" />
 	</target>
 
@@ -33,9 +29,17 @@
 		</javadoc>
 	</target>
 
-	<target name="jar" depends="compile, doc">
-		<mkdir dir="${jar.dir}" />
+	<target name="jar" depends="-ensure-orchestrion-path-is-present, compile, doc">
+		<!-- Copying orchestrion executable files to classes directory so that it gets bundled with JAR -->
+		<property name="orchestrion.executable.dir" value="${classes.dir}/orchestrion" />
+		<mkdir dir="${orchestrion.executable.dir}" />
+		<copy file="${orchestrion.path}/orchestrion.exe" todir="${orchestrion.executable.dir}" />
+		<copy file="${orchestrion.path}/orchestrion.exe.config" todir="${orchestrion.executable.dir}" />
+		<copy file="${orchestrion.path}/TestStack.White.dll" todir="${orchestrion.executable.dir}" />
+		<copy file="${orchestrion.path}/log4net.dll" todir="${orchestrion.executable.dir}" />
+		<copy file="${orchestrion.path}/Castle.Core.dll" todir="${orchestrion.executable.dir}" />
 
+		<mkdir dir="${jar.dir}" />
 		<jar destfile="${jar.file}" basedir="${classes.dir}">
 			<manifest>
 				<attribute name="Built-By" value="${user.name}" />
@@ -48,6 +52,11 @@
 
 		<jar destfile="${doc.jar}" basedir="${doc.dir}" />
 
+	</target>
+
+	<target name="-ensure-orchestrion-path-is-present">		
+		<fail message="Orchestrion executable directory path, which is required for creating the JAR is not set. Provide orchestrion path like 'ant -Dorchestrion.path=PATH'" 
+			unless="orchestrion.path"/>
 	</target>
 
 	<target name="distro" depends="jar">
