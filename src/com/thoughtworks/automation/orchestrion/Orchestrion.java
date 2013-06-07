@@ -9,6 +9,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.lang.management.ManagementFactory;
 import java.net.ServerSocket;
 import java.util.ArrayList;
 
@@ -245,7 +246,20 @@ public final class Orchestrion {
 
 		commands.add("--port");
 		commands.add(String.format("%d", getPort()));
-
+		
+		// Disabling console output as we are not reading it. When the buffer
+		// gets full, process will hang
+		commands.add("--console-output");
+		commands.add("false");
+		
+		// Passing the current pid so that orchestrion process will quit automatically
+		// when this process dies.
+		int pid = getPid();
+		if (pid != NOT_SET) {
+			commands.add("--parent");
+			commands.add(String.format("%d", pid));
+		}
+		
 		if (getHost() != null && !getHost().isEmpty()) {
 			commands.add("--host");
 			commands.add(getHost());
@@ -257,6 +271,31 @@ public final class Orchestrion {
 		}
 
 		return commands.toArray(new String[commands.size()]);
+	}
+	
+	private int getPid() {
+		String name = null;
+		try {
+			name = ManagementFactory.getRuntimeMXBean().getName();
+			if (name == null)
+				return NOT_SET;
+			
+			int pid = Integer.parseInt(name);
+			return pid;
+		}
+		catch(NumberFormatException e) {
+			// JVM may returns something like 1234@localhost
+			String[] parts = name.split("@");
+			if (parts.length > 0) {
+				int pid = Integer.parseInt(parts[0]);
+				return pid;
+			}
+		}
+		catch(Exception e) {
+			return NOT_SET;
+		}
+		
+		return NOT_SET;
 	}
 
 	/**
