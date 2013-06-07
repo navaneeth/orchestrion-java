@@ -4,7 +4,7 @@ import java.util.List;
 
 /**
  * Represents a Window
- *
+ * 
  */
 public class Window extends UIItemContainer {
 
@@ -32,6 +32,17 @@ public class Window extends UIItemContainer {
 	}
 
 	/**
+	 * Gets a value indicating whether this window is a modal window
+	 * 
+	 * @return true if it is a modal window, false otherwise.
+	 * @throws Exception
+	 */
+	public boolean isModal() throws Exception {
+		return Boolean.parseBoolean(RemoteServer.instance().execute("ismodal",
+				getRefId()));
+	}
+
+	/**
 	 * Waits till the processing finishes
 	 * 
 	 * This is useful when some methods are asynchronous and you need to wait
@@ -42,10 +53,12 @@ public class Window extends UIItemContainer {
 	public void waitWhileBusy() throws Exception {
 		RemoteServer.instance().execute("waitwhilebusy", getRefId());
 	}
-	
+
 	/**
 	 * Gets the message box matching the title
-	 * @param title Title of the message box
+	 * 
+	 * @param title
+	 *            Title of the message box
 	 * @return MessageBox if available, null otherwise
 	 * @throws Exception
 	 * @see MessageBox
@@ -63,7 +76,7 @@ public class Window extends UIItemContainer {
 			return null;
 		}
 	}
-	
+
 	/**
 	 * Returns the default menu bar associated within this window
 	 * 
@@ -75,11 +88,12 @@ public class Window extends UIItemContainer {
 				getRefId());
 		return new MenuBar(id, getRefId());
 	}
-	
+
 	/**
-	 * Gets the modal window associated to this window. 
+	 * Gets the modal window associated to this window.
 	 * 
-	 * @param by search criteria to locate the window
+	 * @param by
+	 *            search criteria to locate the window
 	 * @return Window if modal window is present, null otherwise
 	 * @throws Exception
 	 * @see By
@@ -101,28 +115,32 @@ public class Window extends UIItemContainer {
 	 * @throws Exception
 	 * @see Windows
 	 */
-	public Windows getModalWindows() throws Exception {		
+	public Windows getModalWindows() throws Exception {
 		try {
-			int id = RemoteServer.instance().executeAndGetId("getmodalwindows", getRefId());
+			int id = RemoteServer.instance().executeAndGetId("getmodalwindows",
+					getRefId());
 			return new Windows(id);
 		} catch (RefIdNotAvailableException e) {
 			return null;
 		}
 	}
-	
+
 	/**
 	 * Press keyboard shortcuts
 	 * <p>
-	 * This method will hold all the keys but last and press the last key. 
+	 * This method will hold all the keys but last and press the last key.
 	 * <p>
+	 * 
 	 * <pre>
 	 * {@code
 	 * window.pressKeyboardShortcut(new Keys(SpecialKeys.ALT), new Keys('o', 'f'))
 	 * }
 	 * </pre>
+	 * 
 	 * The above code will hold ALT key and presses 'o' and 'f'
 	 * 
-	 * @param keys List of keys which needs to be pressed
+	 * @param keys
+	 *            List of keys which needs to be pressed
 	 * 
 	 * @throws Exception
 	 * @see Keys
@@ -135,13 +153,11 @@ public class Window extends UIItemContainer {
 				final boolean isLastItem = (i + 1) == keys.length;
 				if (isLastItem) {
 					holdAllKeysAndPressLastKey(thisKeys, keyBoard);
-				}
-				else {
+				} else {
 					holdAllKeys(thisKeys, keyBoard);
 				}
 			}
-		}
-		finally {
+		} finally {
 			keyBoard.releaseAllKeys();
 		}
 	}
@@ -152,8 +168,7 @@ public class Window extends UIItemContainer {
 				keyBoard.holdSpecialKey(k);
 				waitWhileBusy();
 			}
-		}
-		else {
+		} else {
 			for (Character c : keys.getRegularKeys()) {
 				keyBoard.enter(c.toString());
 				waitWhileBusy();
@@ -161,23 +176,22 @@ public class Window extends UIItemContainer {
 		}
 	}
 
-	private void holdAllKeysAndPressLastKey(Keys keys, Keyboard keyBoard) throws Exception {
+	private void holdAllKeysAndPressLastKey(Keys keys, Keyboard keyBoard)
+			throws Exception {
 		if (keys.isSpecialKey()) {
-			final List<SpecialKeys> specialKeys = keys.getSpecialKeys(); 
-			for(int i = 0; i < specialKeys.size(); i++) {
+			final List<SpecialKeys> specialKeys = keys.getSpecialKeys();
+			for (int i = 0; i < specialKeys.size(); i++) {
 				final boolean lastKey = (i + 1) == specialKeys.size();
 				if (lastKey) {
 					keyBoard.pressSpecialKey(specialKeys.get(i));
 					waitWhileBusy();
-				}
-				else {
+				} else {
 					keyBoard.holdSpecialKey(specialKeys.get(i));
 					waitWhileBusy();
 				}
 			}
-		}
-		else {
-			for(Character c : keys.getRegularKeys()) {
+		} else {
+			for (Character c : keys.getRegularKeys()) {
 				keyBoard.enter(c.toString());
 				waitWhileBusy();
 			}
