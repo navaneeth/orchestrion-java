@@ -9,6 +9,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.ServerSocket;
 import java.util.ArrayList;
 
 /**
@@ -18,7 +19,6 @@ import java.util.ArrayList;
 public final class Orchestrion {
 
 	private final int NOT_SET = -1;
-	private final int DEFAULT_PORT = 8082;
 
 	private File workingDir;
 	private Process orchestrionProcess;
@@ -41,10 +41,14 @@ public final class Orchestrion {
 	 * Gets the port in which orchestrion test environment is hosted
 	 * 
 	 * @return port in use
+	 * @throws OrchestrionException
+	 *             If it can't find a port
 	 */
-	public int getPort() {
-		if (this.port == NOT_SET)
-			return DEFAULT_PORT;
+	public int getPort() throws OrchestrionException {
+		if (this.port == NOT_SET) {
+			this.port = findFreePort();
+		}
+
 		return this.port;
 	}
 
@@ -214,7 +218,8 @@ public final class Orchestrion {
 				reader.close();
 				throw new OrchestrionException(
 						"Can't start orchestrion test environment."
-								+ errorMessage.toString(), null);
+								+ errorMessage.toString() + ". Exit code "
+								+ exitValue, null);
 			}
 
 		} catch (IOException e) {
@@ -233,15 +238,13 @@ public final class Orchestrion {
 		}
 	}
 
-	private String[] getCommandLineArgs() {
+	private String[] getCommandLineArgs() throws OrchestrionException {
 		ArrayList<String> commands = new ArrayList<String>();
 		commands.add(workingDir.getAbsolutePath() + File.separator
 				+ "orchestrion.exe");
 
-		if (getPort() != NOT_SET) {
-			commands.add("--port");
-			commands.add(String.format("%d", getPort()));
-		}
+		commands.add("--port");
+		commands.add(String.format("%d", getPort()));
 
 		if (getHost() != null && !getHost().isEmpty()) {
 			commands.add("--host");
@@ -324,6 +327,27 @@ public final class Orchestrion {
 		}
 
 		return (temp);
+	}
+
+	public int findFreePort() throws OrchestrionException {
+		ServerSocket socket = null;
+		try {
+			socket = new ServerSocket(0);
+			return socket.getLocalPort();
+		} catch (IOException e) {
+
+		} finally {
+			if (socket != null) {
+				try {
+					socket.close();
+				} catch (IOException e) {
+				}
+			}
+		}
+
+		throw new OrchestrionException(
+				"Can't find a free port. Try setting a port value using setPort()",
+				null);
 	}
 
 }
