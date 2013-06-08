@@ -29,6 +29,7 @@ public final class Orchestrion {
 	private String host;
 	private File logsDirectory;
 	private final List<String> orchestrionFiles = new ArrayList<String>();
+	private boolean isWorkingDirTemporary = false;
 
 	public Orchestrion() {
 		orchestrionFiles.add("Castle.Core.dll");
@@ -137,19 +138,19 @@ public final class Orchestrion {
 			throws OrchestrionException {
 		if (workingDirectory == null)
 			throw new NullPointerException("workingDirectory");
-		
+
 		workingDirectory = workingDirectory.trim();
 
 		File dir = new File(workingDirectory);
 		ensureWorkingDirectoryIsValid(dir);
 		this.workingDir = dir;
 	}
-	
+
 	private void ensureWorkingDirectoryIsValid(File dir)
 			throws OrchestrionException {
 		if (dir == null)
 			throw new OrchestrionException("Working directory is not set", null);
-		
+
 		if (!dir.exists() || !dir.isDirectory())
 			throw new OrchestrionException(String.format("%s is invalid.",
 					dir.getAbsolutePath()), null);
@@ -157,7 +158,7 @@ public final class Orchestrion {
 		if (!dir.canRead())
 			throw new OrchestrionException(String.format("%s is not readable",
 					dir.getAbsolutePath()), null);
-		
+
 		for (String file : orchestrionFiles) {
 			File f = new File(dir, file);
 			if (!f.exists())
@@ -215,7 +216,8 @@ public final class Orchestrion {
 	 */
 	public void start() throws OrchestrionException {
 		if (getWorkingDirectory() == null) {
-			// Creating a temporary working directory and copying orchestrion files from the JAR
+			// Creating a temporary working directory and copying orchestrion
+			// files from the JAR
 			final File tempDir;
 			try {
 				tempDir = createTempDirectory();
@@ -224,14 +226,15 @@ public final class Orchestrion {
 						"Can't start orchestrion process. Error creating temporary working directory",
 						e);
 			}
-			
+
 			for (String file : orchestrionFiles) {
 				copyFileFromBundleTo(file, tempDir);
 			}
 
 			this.workingDir = tempDir;
+			isWorkingDirTemporary = true;
 		}
-		
+
 		startTestEnvironment();
 	}
 
@@ -358,6 +361,8 @@ public final class Orchestrion {
 		} catch (Exception e) {
 			// Graceful exit failed. Forcefully killing.
 			orchestrionProcess.destroy();
+		} finally {
+			deleteTemporaryWorkingDirectory();
 		}
 	}
 
@@ -373,6 +378,21 @@ public final class Orchestrion {
 		return null;
 	}
 
+	private void deleteTemporaryWorkingDirectory() {
+		if (isWorkingDirTemporary && workingDir.exists()) {
+			try {
+				File[] files = workingDir.listFiles();
+				for (File file : files) {
+					file.delete();
+				}
+
+				workingDir.delete();
+			} catch (Exception e) {
+				// ignore as it is a temporary directory
+			}
+		}
+	}
+
 	private void copyFileFromBundleTo(String fileName, File outDir)
 			throws OrchestrionException {
 		final ClassLoader classLoader = Thread.currentThread()
@@ -380,8 +400,10 @@ public final class Orchestrion {
 		InputStream stream = classLoader.getResourceAsStream("orchestrion/"
 				+ fileName);
 		if (stream == null)
-			throw new OrchestrionException(String.format(
-					"Can't copy %s from the bundle. Make sure you are using the correct JAR file", fileName), null);
+			throw new OrchestrionException(
+					String.format(
+							"Can't copy %s from the bundle. Make sure you are using the correct JAR file",
+							fileName), null);
 
 		try {
 			File file = new File(outDir, fileName);
