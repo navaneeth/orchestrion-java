@@ -12,6 +12,7 @@ import java.io.InputStreamReader;
 import java.lang.management.ManagementFactory;
 import java.net.ServerSocket;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Manages orchestrion test environment
@@ -27,6 +28,15 @@ public final class Orchestrion {
 	private int timeoutInMs = 1000;
 	private String host;
 	private File logsDirectory;
+	private final List<String> orchestrionFiles = new ArrayList<String>();
+
+	public Orchestrion() {
+		orchestrionFiles.add("Castle.Core.dll");
+		orchestrionFiles.add("orchestrion.exe");
+		orchestrionFiles.add("orchestrion.exe.config");
+		orchestrionFiles.add("TestStack.White.dll");
+		orchestrionFiles.add("log4net.dll");
+	}
 
 	/**
 	 * Sets the port which orchestrion test environment will be hosted
@@ -111,6 +121,58 @@ public final class Orchestrion {
 		return null;
 	}
 
+	/**
+	 * Sets the working directory. A working directory is where all orchestrion
+	 * executable files are placed. If this is not set, it will try to use the
+	 * bundled orchestrion files.
+	 * <p>
+	 * If you are using orchestrion-java.jar, then you don't need to set this.
+	 * Orchestrion-java takes care of setting working directory.
+	 * 
+	 * @param workingDirectory
+	 *            a valid readable directory where orchestrion files are present
+	 * @throws OrchestrionException
+	 */
+	public void setWorkingDirectory(String workingDirectory)
+			throws OrchestrionException {
+		if (workingDirectory == null)
+			throw new NullPointerException("workingDirectory");
+		
+		workingDirectory = workingDirectory.trim();
+
+		File dir = new File(workingDirectory);
+		ensureWorkingDirectoryIsValid(dir);
+		this.workingDir = dir;
+	}
+	
+	private void ensureWorkingDirectoryIsValid(File dir)
+			throws OrchestrionException {
+		if (dir == null)
+			throw new OrchestrionException("Working directory is not set", null);
+		
+		if (!dir.exists() || !dir.isDirectory())
+			throw new OrchestrionException(String.format("%s is invalid.",
+					dir.getAbsolutePath()), null);
+
+		if (!dir.canRead())
+			throw new OrchestrionException(String.format("%s is not readable",
+					dir.getAbsolutePath()), null);
+		
+		for (String file : orchestrionFiles) {
+			File f = new File(dir, file);
+			if (!f.exists())
+				throw new OrchestrionException(String.format(
+						"%s is not a valid working directory. Can't find %s",
+						dir.getAbsolutePath(), file), null);
+
+			if (file.endsWith(".exe") && !f.canExecute())
+				throw new OrchestrionException(
+						String.format(
+								"%s is not a valid working directory. %s is not executable",
+								f.getAbsolutePath(), file), null);
+		}
+	}
+
 	private boolean isDirectoryAvailable(File dir) {
 		try {
 			return dir.isDirectory();
@@ -152,39 +214,29 @@ public final class Orchestrion {
 	 * @throws OrchestrionException
 	 */
 	public void start() throws OrchestrionException {
-		final File tempDir;
-		try {
-			tempDir = createTempDirectory();
-		} catch (IOException e) {
-			throw new OrchestrionException(
-					"Can't start orchestrion process. Error creating temporary working directory",
-					e);
+		if (getWorkingDirectory() == null) {
+			// Creating a temporary working directory and copying orchestrion files from the JAR
+			final File tempDir;
+			try {
+				tempDir = createTempDirectory();
+			} catch (IOException e) {
+				throw new OrchestrionException(
+						"Can't start orchestrion process. Error creating temporary working directory",
+						e);
+			}
+			
+			for (String file : orchestrionFiles) {
+				copyFileFromBundleTo(file, tempDir);
+			}
+
+			this.workingDir = tempDir;
 		}
-
-		copyFileTo("Castle.Core.dll", tempDir);
-		copyFileTo("orchestrion.exe", tempDir);
-		copyFileTo("orchestrion.exe.config", tempDir);
-		copyFileTo("TestStack.White.dll", tempDir);
-		copyFileTo("log4net.dll", tempDir);
-
-		start(tempDir.getAbsolutePath());
+		
+		startTestEnvironment();
 	}
 
-	/**
-	 * Starts orchestrion test environment in the specified working directory
-	 * 
-	 * @param workingDirectory
-	 *            Directory where all orchestrion files are present
-	 * @throws OrchestrionException
-	 */
-	public void start(String workingDirectory) throws OrchestrionException {
-		if (workingDirectory == null)
-			throw new NullPointerException("workingDirectory");
-
-		workingDir = new File(workingDirectory);
-		if (!workingDir.exists() || !workingDir.isDirectory())
-			throw new OrchestrionException(String.format("%s is invalid.",
-					workingDirectory), null);
+	private void startTestEnvironment() throws OrchestrionException {
+		ensureWorkingDirectoryIsValid(workingDir);
 
 		try {
 			String[] commandLineArgs = getCommandLineArgs();
@@ -246,20 +298,21 @@ public final class Orchestrion {
 
 		commands.add("--port");
 		commands.add(String.format("%d", getPort()));
-		
+
 		// Disabling console output as we are not reading it. When the buffer
 		// gets full, process will hang
 		commands.add("--console-output");
 		commands.add("false");
-		
-		// Passing the current pid so that orchestrion process will quit automatically
+
+		// Passing the current pid so that orchestrion process will quit
+		// automatically
 		// when this process dies.
 		int pid = getPid();
 		if (pid != NOT_SET) {
 			commands.add("--parent");
 			commands.add(String.format("%d", pid));
 		}
-		
+
 		if (getHost() != null && !getHost().isEmpty()) {
 			commands.add("--host");
 			commands.add(getHost());
@@ -272,29 +325,27 @@ public final class Orchestrion {
 
 		return commands.toArray(new String[commands.size()]);
 	}
-	
+
 	private int getPid() {
 		String name = null;
 		try {
 			name = ManagementFactory.getRuntimeMXBean().getName();
 			if (name == null)
 				return NOT_SET;
-			
+
 			int pid = Integer.parseInt(name);
 			return pid;
-		}
-		catch(NumberFormatException e) {
+		} catch (NumberFormatException e) {
 			// JVM may returns something like 1234@localhost
 			String[] parts = name.split("@");
 			if (parts.length > 0) {
 				int pid = Integer.parseInt(parts[0]);
 				return pid;
 			}
-		}
-		catch(Exception e) {
+		} catch (Exception e) {
 			return NOT_SET;
 		}
-		
+
 		return NOT_SET;
 	}
 
@@ -322,7 +373,7 @@ public final class Orchestrion {
 		return null;
 	}
 
-	private void copyFileTo(String fileName, File outDir)
+	private void copyFileFromBundleTo(String fileName, File outDir)
 			throws OrchestrionException {
 		final ClassLoader classLoader = Thread.currentThread()
 				.getContextClassLoader();
@@ -330,7 +381,7 @@ public final class Orchestrion {
 				+ fileName);
 		if (stream == null)
 			throw new OrchestrionException(String.format(
-					"Can't copy %s from the bundle", fileName), null);
+					"Can't copy %s from the bundle. Make sure you are using the correct JAR file", fileName), null);
 
 		try {
 			File file = new File(outDir, fileName);
