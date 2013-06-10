@@ -238,6 +238,18 @@ public final class Orchestrion {
 		startTestEnvironment();
 	}
 
+	/**
+	 * This attaches to the current running test environment
+	 * 
+	 * @param port
+	 *            port which test environment is running
+	 * @param host
+	 *            host which test environment is running
+	 */
+	public void attach(int port, String host) {
+		RemoteServer.initialize(port, getTimeout(), host);
+	}
+
 	private void startTestEnvironment() throws OrchestrionException {
 		ensureWorkingDirectoryIsValid(workingDir);
 

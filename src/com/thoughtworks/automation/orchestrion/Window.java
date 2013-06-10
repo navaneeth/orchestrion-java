@@ -90,11 +90,33 @@ public class Window extends UIItemContainer {
 	}
 
 	/**
+	 * Gets the modal window associated to this window
+	 * 
+	 * @param title
+	 *            Modal window's title
+	 * @return a Window instance representing the modal window, null otherwise
+	 * @throws Exception
+	 */
+	public Window getModalWindow(String title) throws Exception {
+		if (title == null || title.isEmpty())
+			throw new NullPointerException("title");
+
+		try {
+			int id = RemoteServer.instance().executeAndGetId("getmodalwindow",
+					getRefId(), title);
+			return new Window(id);
+		} catch (RefIdNotAvailableException e) {
+			return null;
+		}
+
+	}
+
+	/**
 	 * Gets the modal window associated to this window.
 	 * 
 	 * @param by
 	 *            search criteria to locate the window
-	 * @return Window if modal window is present, null otherwise
+	 * @return a Window instance representing the modal window, null otherwise
 	 * @throws Exception
 	 * @see By
 	 */
