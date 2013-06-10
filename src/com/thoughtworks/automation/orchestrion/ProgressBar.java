@@ -5,7 +5,7 @@ package com.thoughtworks.automation.orchestrion;
 
 /**
  * Represents a progress bar
- *
+ * 
  */
 public class ProgressBar extends UIItem {
 
@@ -15,7 +15,7 @@ public class ProgressBar extends UIItem {
 	public ProgressBar(int refId) {
 		super(refId);
 	}
-	
+
 	/**
 	 * Gets the maximum value for this progress bar
 	 * 
@@ -23,9 +23,10 @@ public class ProgressBar extends UIItem {
 	 * @throws Exception
 	 */
 	public int getMaxValue() throws Exception {
-		return RemoteServer.instance().executeAndGetId("getmaxvalue", getRefId());
+		return RemoteServer.instance().executeAndGetId("getmaxvalue",
+				getRefId());
 	}
-	
+
 	/**
 	 * Gets the minimum value for this progress bar
 	 * 
@@ -33,9 +34,10 @@ public class ProgressBar extends UIItem {
 	 * @throws Exception
 	 */
 	public int getMinValue() throws Exception {
-		return RemoteServer.instance().executeAndGetId("getminvalue", getRefId());
+		return RemoteServer.instance().executeAndGetId("getminvalue",
+				getRefId());
 	}
-	
+
 	/**
 	 * Gets the current value
 	 * 
