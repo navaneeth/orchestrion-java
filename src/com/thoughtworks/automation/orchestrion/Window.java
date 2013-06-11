@@ -1,7 +1,5 @@
 package com.thoughtworks.automation.orchestrion;
 
-import java.util.List;
-
 /**
  * Represents a Window
  * 
@@ -150,12 +148,14 @@ public class Window extends UIItemContainer {
 	/**
 	 * Press keyboard shortcuts
 	 * <p>
-	 * This method will hold all the keys but last and press the last key.
+	 * This method will hold all the keys except the last and press the last
+	 * key. Only special keys will be put on hold, all other keys will be
+	 * pressed
 	 * <p>
 	 * 
 	 * <pre>
 	 * {@code
-	 * window.pressKeyboardShortcut(new Keys(SpecialKeys.ALT), new Keys('o', 'f'))
+	 * window.pressKeyboardShortcut(Key.ALT, Key.from('o'), Key.from('f'))
 	 * }
 	 * </pre>
 	 * 
@@ -167,56 +167,26 @@ public class Window extends UIItemContainer {
 	 * @throws Exception
 	 * @see Keys
 	 */
-	public void pressKeyboardShortcut(Keys... keys) throws Exception {
+	public void pressKeyboardShortcut(Key... keys) throws Exception {
 		Keyboard keyBoard = getKeyBoard();
 		try {
 			for (int i = 0; i < keys.length; i++) {
-				final Keys thisKeys = keys[i];
+				final Key thisKey = keys[i];
 				final boolean isLastItem = (i + 1) == keys.length;
 				if (isLastItem) {
-					holdAllKeysAndPressLastKey(thisKeys, keyBoard);
+					keyBoard.pressKey(thisKey);
+					waitWhileBusy();
 				} else {
-					holdAllKeys(thisKeys, keyBoard);
+					if (thisKey.isSpecialKey()) {
+						keyBoard.holdSpecialKey(thisKey);
+					} else {
+						keyBoard.pressKey(thisKey);
+						waitWhileBusy();
+					}
 				}
 			}
 		} finally {
 			keyBoard.releaseAllKeys();
-		}
-	}
-
-	private void holdAllKeys(Keys keys, Keyboard keyBoard) throws Exception {
-		if (keys.isSpecialKey()) {
-			for (SpecialKeys k : keys.getSpecialKeys()) {
-				keyBoard.holdSpecialKey(k);
-				waitWhileBusy();
-			}
-		} else {
-			for (Character c : keys.getRegularKeys()) {
-				keyBoard.enter(c.toString());
-				waitWhileBusy();
-			}
-		}
-	}
-
-	private void holdAllKeysAndPressLastKey(Keys keys, Keyboard keyBoard)
-			throws Exception {
-		if (keys.isSpecialKey()) {
-			final List<SpecialKeys> specialKeys = keys.getSpecialKeys();
-			for (int i = 0; i < specialKeys.size(); i++) {
-				final boolean lastKey = (i + 1) == specialKeys.size();
-				if (lastKey) {
-					keyBoard.pressSpecialKey(specialKeys.get(i));
-					waitWhileBusy();
-				} else {
-					keyBoard.holdSpecialKey(specialKeys.get(i));
-					waitWhileBusy();
-				}
-			}
-		} else {
-			for (Character c : keys.getRegularKeys()) {
-				keyBoard.enter(c.toString());
-				waitWhileBusy();
-			}
 		}
 	}
 
